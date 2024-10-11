@@ -22,7 +22,14 @@ const findUserByName = (name) => {
   return users["users_list"].filter((user) => user["name"] === name);
 };
 
-// new Function to add a new user
+// function to find users by name/job
+const findUsersByNameAndJob = (name, job) => {
+  return users["users_list"].filter(
+    (user) => user["name"] === name && user["job"] === job
+  );
+};
+
+// Function to add a new user
 const addUser = (user) => {
   users["users_list"].push(user);
   return user;
@@ -33,20 +40,40 @@ const findUserById = (id) => {
   return users["users_list"].find((user) => user["id"] === id);
 };
 
+// function to delete a user by ID
+const deleteUserById = (id) => {
+  const index = users["users_list"].findIndex((user) => user["id"] === id);
+  if (index !== -1) {
+    users["users_list"].splice(index, 1); // Remove the user from the list
+    return true;
+  } else {
+    return false;
+  }
+};
+
 // Default route that sends "Hello World!"
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-// /users route that either returns the entire list or filters by name
+// Extended /users route to return the entire list or filter by name and job
 app.get("/users", (req, res) => {
-  const name = req.query.name; // Extract 'name' query parameter
-  if (name !== undefined) {
+  const name = req.query.name;
+  const job = req.query.job;
+
+  if (name !== undefined && job !== undefined) {
+    // Return users that match both name and job
+    let result = findUsersByNameAndJob(name, job);
+    result = { users_list: result };
+    res.send(result);
+  } else if (name !== undefined) {
+    // Return users that match the name
     let result = findUserByName(name);
-    result = { users_list: result }; // Format the result in the same structure
+    result = { users_list: result };
     res.send(result);
   } else {
-    res.send(users); // Return the full users list if no name is provided
+    // Return the entire users list
+    res.send(users);
   }
 });
 
@@ -57,12 +84,23 @@ app.post("/users", (req, res) => {
   res.status(200).send(); // Respond with status 200 (OK)
 });
 
+// DELETE /users/:id to remove a user by their ID
+app.delete("/users/:id", (req, res) => {
+  const id = req.params.id; // Extract 'id' from the URL
+  const result = deleteUserById(id);
+  if (result) {
+    res.status(200).send(`User with id ${id} deleted.`);
+  } else {
+    res.status(404).send("Resource not found.");
+  }
+});
+
 // /users/:id route to get a user by ID
 app.get("/users/:id", (req, res) => {
   const id = req.params.id; // Extract 'id' from the URL
   let result = findUserById(id);
   if (result === undefined) {
-    res.status(404).send("Resource not found."); // Returns 404 if usr not found
+    res.status(404).send("Resource not found."); // Returns 404 if user not found
   } else {
     res.send(result); // Send the user if found
   }
