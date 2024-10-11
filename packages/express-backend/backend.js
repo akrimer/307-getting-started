@@ -24,6 +24,13 @@ const findUserByName = (name) => {
   );
 };
 
+// find user by ID function 
+const findUserById = (id) => {
+  return users["users_list"].find(
+    (user) => user["id"] === id
+  );
+};
+
 // Default route that sends "Hello World!"
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -38,6 +45,17 @@ app.get("/users", (req, res) => {
     res.send(result);
   } else {
     res.send(users);
+  }
+});
+
+
+app.get("/users/:id", (req, res) => {
+  const id = req.params.id; // Extract 'id' parameter from the URL
+  let result = findUserById(id);
+  if (result === undefined) {
+    res.status(404).send("Resource not found."); // Return 404 if user is not found
+  } else {
+    res.send(result); // Send the user if found
   }
 });
 
