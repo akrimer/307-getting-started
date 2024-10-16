@@ -1,9 +1,11 @@
 // backend.js
 import express from "express";
+import cors from "cors";  // Import cors
 
 const app = express();
 const port = 8000;
 
+app.use(cors()); // Enable cors
 app.use(express.json()); // Allows us to parse incoming JSON requests
 
 // Users list (data to be served at the /users endpoint)
@@ -22,15 +24,16 @@ const findUserByName = (name) => {
   return users["users_list"].filter((user) => user["name"] === name);
 };
 
-// function to find users by name/job
+// Function to find users by name/job
 const findUsersByNameAndJob = (name, job) => {
   return users["users_list"].filter(
     (user) => user["name"] === name && user["job"] === job
   );
 };
 
-// Function to add a new user
+// Function to add a new user with a randomly generated ID
 const addUser = (user) => {
+  user.id = Math.random().toString(36).substr(2, 9); // Generate random ID
   users["users_list"].push(user);
   return user;
 };
@@ -40,7 +43,7 @@ const findUserById = (id) => {
   return users["users_list"].find((user) => user["id"] === id);
 };
 
-// function to delete a user by ID
+// Function to delete a user by ID
 const deleteUserById = (id) => {
   const index = users["users_list"].findIndex((user) => user["id"] === id);
   if (index !== -1) {
@@ -77,11 +80,11 @@ app.get("/users", (req, res) => {
   }
 });
 
-// POST for /users to add a new user
+// POST for /users to add a new user and return 201 status with the user object
 app.post("/users", (req, res) => {
   const userToAdd = req.body; // Extract the new user data from the request body
-  addUser(userToAdd); // Add the new user to the list
-  res.status(200).send(); // Respond with status 200 (OK)
+  const addedUser = addUser(userToAdd); // Add the new user to the list with generated ID
+  res.status(201).json(addedUser); // Respond with status 201 and send the newly created user
 });
 
 // DELETE /users/:id to remove a user by their ID
@@ -89,9 +92,9 @@ app.delete("/users/:id", (req, res) => {
   const id = req.params.id; // Extract 'id' from the URL
   const result = deleteUserById(id);
   if (result) {
-    res.status(200).send(`User with id ${id} deleted.`);
+    res.status(204).send(); // Return 204 No Content if deletion was successful
   } else {
-    res.status(404).send("Resource not found.");
+    res.status(404).send("Resource not found."); // Return 404 if user not found
   }
 });
 
