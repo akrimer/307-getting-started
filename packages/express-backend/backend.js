@@ -14,7 +14,7 @@ mongoose.set("debug", true);
 
 // Connect to MongoDB using the connection string from .env
 mongoose
-  .connect(MONGO_CONNECTION_STRING, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(MONGO_CONNECTION_STRING)
   .then(() => console.log('Connected to MongoDB'))
   .catch((error) => console.log('Error connecting to MongoDB:', error));
 
