@@ -1,5 +1,4 @@
-
-// services/user-service.js
+//user-services.js
 import mongoose from "mongoose";
 import User from '../models/user.js'; // Import the User model
 
