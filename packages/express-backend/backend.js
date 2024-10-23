@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";  // Import cors
 import mongoose from "mongoose"; // Import mongoose
 import dotenv from "dotenv"; // Import dotenv to load environment variables
-import userService from './services/user-service.js'; // Import the user service layer
+import userService from './services/user-services.js'; // Import the user service layer
 
 dotenv.config(); // Load environment variables from .env file
 
